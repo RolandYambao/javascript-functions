@@ -50,6 +50,8 @@ foo(1, false, 'hello world');
 
 This invokes (calls/runs) our function. The output in your console from this
 invokation will be
+
+### output:
 ```
 {
 	firstArgument: 1,
@@ -72,6 +74,7 @@ foo(someNumber, someBoolean, someString);
 
 This will also print
 
+### output:
 ```
 {
 	firstArgument: 1,
@@ -97,6 +100,7 @@ foo(arg2, arg0, arg1); // !!!
 Because we have invoked the function twice, it will print two different times.
 In order, these outputs will be.
 
+### output:
 ```
 // foo(arg0, arg1, arg2)
 {
@@ -114,7 +118,7 @@ In order, these outputs will be.
 ```
 
 
-# Functions with return values
+## Functions with return values
 
 Now that we know how functions are invoked, lets see another important use of
 functions, return values.
@@ -173,6 +177,7 @@ console.log('output', newObject);
 After checking its output we can see that it has returned the opposite of the
 four arguments passed in.
 
+### output:
 ```
 input hello world 25 false 2021
 output { first: 'dlrow olleh', second: -25, third: true, fourth: -2021 }
@@ -180,9 +185,143 @@ output { first: 'dlrow olleh', second: -25, third: true, fourth: -2021 }
 
 ______________________________________________________________________________
 
-# Functions with side-effects
+## Functions with side-effects
 
 A function is not just able to return new values, a function can also affect
 the data *outside* of the function as well. This is what is known as a
 side-effect. Let's take a look at two functions below, one is a pure
 function, and the other produces a side-effect.
+
+```js
+function sideEffectFunction(array) {
+	for (let i = 0; i < array.length; i++) {
+		array[i] *= -1;
+	}
+	return array;
+}
+let beforeArray = [2, 4, 8, 16, 32, 64, 128];
+let afterArray = sideEffectFunction(beforeArray);
+console.log('beforeArray', beforeArray)
+console.log('afterArray', afterArray);
+```
+
+### output:
+```
+beforeArray [
+    -2,  -4,  -8,
+   -16, -32, -64,
+  -128
+]
+afterArray [
+    -2,  -4,  -8,
+   -16, -32, -64,
+  -128
+]
+```
+
+```js
+function pureFunction(array) {
+	const copy = array.slice();
+	for (let i = 0; i < copy.length; i++) {
+		copy[i] *= -1;
+	}
+	return copy;
+}
+let beforeArray = [2, 4, 8, 16, 32, 64, 128];
+let afterArray = pureFunction(beforeArray);
+console.log('beforeArray', beforeArray)
+console.log('afterArray', afterArray);
+```
+
+### output:
+```
+beforeArray [
+   2,  4,   8, 16,
+  32, 64, 128
+]
+afterArray [
+    -2,  -4,  -8,
+   -16, -32, -64,
+  -128
+]
+```
+
+Note that a pure function will not cause any side-effects, it will only return
+new values from its inputs. This particular pure function expects an array, and
+instead of modifying its values directly, it creates a shallow copy (using the Array.
+prototype.slice method read more on [MDN here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice))
+
+______________________________________________________________________________
+
+## Function Expressions
+
+Function Expressions are functions that are declared at runtime and ***will only
+be recognized below their declaration***. Additionally, they can be stored in 
+variables to be reused at a later time. There are multiple ways to declare a
+function expression, so let's take a look at the most popular ways. The
+following four functions expressions all accomplish the same task, but in
+slightly different configurations.
+
+```js
+const functionExpression0 = function sum(a, b) { return a + b; }
+const functionExpression1 = function (a, b) { return a + b; }
+const functionExpression2 = (a, b) => { return a + b; }
+const functionExpression3 = (a, b) => a + b;
+
+console.log(functionExpression0(32, 64),
+	        functionExpression1(32, 64),
+			functionExpression2(32, 64),
+        	functionExpression3(32, 64));
+```
+
+### output:
+```
+96 96 96 96
+```
+
+The first method may seem familiar to you already, it is declared almost
+identically to the function declarations that we have already used throughout
+this lesson. So let's take a look at the following three.
+
+functionExpression 1 to 3 are all known as **anonymous functions**, this means
+that alone, they do not have a name to refer to them. This is essentially
+irrelevant, as we are then assigning these anonymous functions to variables that
+we can then invoke.
+
+Let's take a look at the new syntax for functionExpressions 2 and 3. These are
+made utilizing a feature that was made standard on June 17, 2015 known as **arrow
+functions**.
+
+Arrow functions are similar to, but different than functions declared with the
+`function` keyword. For now, let's ignore those differences, but to satisfy your
+curiosity you may read more on [MDN here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions).
+
+Arrow functions are useful for many applications as a shorthand, especially in
+callbacks. If your function only evaluates and returns a singular expression,
+you may remove the curly braces from its definition and fit that expression on
+the same line as in `functionExpression3`. Let's take a look at some routes in
+express that can be represented in a few different ways.
+
+```js
+app.get('/', function (req, res) {
+	res.send('hello world');
+})
+
+app.get('/', (req, res) => {
+	res.send('hello world');
+})
+
+const rootHandler = (req, res) => {
+	res.send('hello world');
+}
+app.get('/', rootHandler);
+
+function handleRequest(req, res) {
+	res.send('hello world');
+}
+app.get('/', handleRequest);
+```
+
+All of the previous methods of declaring a route will work, you may choose any
+method that you like, just remember to keep things consistent to keep them
+readable and maintainable.
